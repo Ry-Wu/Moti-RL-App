@@ -40,13 +40,17 @@ button { color: inherit; }
 
 .app-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0 56px; }
 
-.topbar { height: 58px; display: flex; align-items: center; margin-bottom: 22px; }
+.topbar { height: 58px; display: flex; align-items: center; margin-bottom: 12px; }
 .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 800; letter-spacing: -0.04em; font-size: 20px; }
 .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; color: var(--lime); background: var(--ink); border-radius: 50%; font: 500 16px "DM Mono", monospace; transform: rotate(-7deg); }
 .date-chip { margin-left: auto; margin-right: 12px; padding: 8px 13px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font: 500 11px "DM Mono", monospace; text-transform: uppercase; letter-spacing: 0.06em; }
 .icon-button { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer; transition: .2s ease; }
 .icon-button:hover { background: var(--ink); color: white; transform: rotate(-20deg); }
 .icon-button svg { width: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.how-it-works { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; padding: 11px 2px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.how-it-works span { flex: 0 0 auto; color: var(--blue); font: 600 10px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .12em; }
+.how-it-works p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
 
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(300px, .75fr); gap: 16px; }
 .session-card, .score-card, .panel { border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
@@ -69,7 +73,7 @@ button { color: inherit; }
 .session-input-wrap span { font: 500 8px "DM Mono", monospace; color: rgba(255,255,255,.45); letter-spacing: .12em; }
 .session-input-wrap input { width: 100%; border: 0; outline: 0; color: white; background: transparent; font-weight: 600; font-size: 14px; }
 .session-input-wrap input::placeholder { color: rgba(255,255,255,.33); font-weight: 400; }
-.primary-button { min-width: 175px; border: 0; border-radius: 13px; background: var(--lime); padding: 0 17px 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 25px; cursor: pointer; font-size: 13px; font-weight: 800; transition: transform .2s ease, background .2s ease; }
+.primary-button { min-width: 175px; border: 0; border-radius: 13px; color: var(--ink); background: var(--lime); padding: 0 17px 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 25px; cursor: pointer; font-size: 13px; font-weight: 800; transition: transform .2s ease, background .2s ease; }
 .primary-button:hover { transform: translateY(-2px); background: #e1ff68; }
 .button-arrow { font: 500 22px "DM Mono", monospace; }
 .session-card.active .primary-button { background: white; }
@@ -172,6 +176,7 @@ dialog p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .embedded body { background: var(--paper); }
 .embedded .topbar { display: none; }
 .embedded .app-shell { width: min(1180px, calc(100% - 24px)); padding-top: 12px; }
+.embedded .how-it-works { margin-top: 0; }
 .embedded .hero-grid { margin-top: 0; }
 
 @media (max-width: 700px) {
@@ -190,6 +195,7 @@ dialog p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 @media (max-width: 600px) {
   .app-shell { width: min(100% - 24px, 1180px); padding-top: 12px; }
   .topbar { margin-bottom: 12px; }
+  .how-it-works { align-items: flex-start; flex-direction: column; gap: 5px; padding: 10px 2px; }
   .date-chip { display: none; }
   .icon-button { margin-left: auto; }
   .session-card, .score-card, .panel { border-radius: 17px; padding: 20px; }
