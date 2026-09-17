@@ -101,7 +101,7 @@ button { color: inherit; }
 .add-task input { flex: 1; min-width: 0; padding: 0 12px; border: 0; outline: 0; background: transparent; font-size: 13px; }
 kbd { color: #9a9a92; font: 500 8px "DM Mono", monospace; }
 .task-list { list-style: none; margin: 14px 0 0; padding: 0; }
-.task-item { display: grid; grid-template-columns: 25px 1fr auto; align-items: center; gap: 10px; padding: 13px 4px; border-bottom: 1px solid var(--line); animation: slideIn .25s ease both; }
+.task-item { display: grid; grid-template-columns: 25px minmax(0, 1fr) auto auto; align-items: center; gap: 10px; padding: 13px 4px; border-bottom: 1px solid var(--line); animation: slideIn .25s ease both; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(-5px); } }
 .task-check { width: 21px; height: 21px; display: grid; place-items: center; padding: 0; border: 1.5px solid #a5a69f; border-radius: 50%; background: transparent; cursor: pointer; transition: .2s; }
 .task-check:hover { border-color: var(--blue); }
@@ -110,6 +110,10 @@ kbd { color: #9a9a92; font: 500 8px "DM Mono", monospace; }
 .task-item.done .task-check svg { opacity: 1; }
 .task-text { font-size: 13px; font-weight: 600; }
 .task-item.done .task-text { color: #9c9d96; text-decoration: line-through; }
+.task-start { padding: 6px 11px; border: 1px solid rgba(34,71,215,.22); border-radius: 99px; color: var(--blue); background: rgba(34,71,215,.07); cursor: pointer; font: 600 10px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .04em; transition: .2s ease; }
+.task-start:hover:not(:disabled) { color: white; background: var(--blue); transform: translateY(-1px); }
+.task-start:disabled { cursor: not-allowed; opacity: .32; }
+.task-start.active:disabled { color: var(--ink); background: var(--lime); border-color: var(--lime-dark); opacity: 1; }
 .task-delete { opacity: 0; border: 0; background: transparent; color: #9b9c94; cursor: pointer; font: 400 18px "DM Mono", monospace; transition: .2s; }
 .task-item:hover .task-delete { opacity: 1; }
 .task-delete:hover { color: var(--red); }

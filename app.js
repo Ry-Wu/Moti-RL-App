@@ -102,11 +102,12 @@ function addEvent(type, score, label, sessionId = null) {
   state.events.unshift({ id: makeId(), type, score, label, sessionId, timestamp: Date.now() });
 }
 
-function startSession() {
-  const intention = els.sessionInput.value.trim() || "Open work session";
+function startSession(intentionOverride = "", taskId = null) {
+  if (state.activeSession) return;
+  const intention = intentionOverride || els.sessionInput.value.trim() || "Open work session";
   const sessionId = makeId();
   const score = randomBetween(1, 50);
-  state.activeSession = { id: sessionId, intention, startedAt: Date.now() };
+  state.activeSession = { id: sessionId, intention, taskId, startedAt: Date.now() };
   addEvent("start", score, intention, sessionId);
   els.sessionInput.value = "";
   saveState();
@@ -193,15 +194,19 @@ function renderTasks() {
   const open = state.tasks.filter((task) => !task.done).length;
   els.taskCount.textContent = `${open} open`;
   els.emptyTasks.hidden = state.tasks.length > 0;
-  els.taskList.innerHTML = state.tasks.map((task) => `
+  els.taskList.innerHTML = state.tasks.map((task) => {
+    const isActiveTask = state.activeSession?.taskId === task.id;
+    return `
     <li class="task-item ${task.done ? "done" : ""}" data-id="${task.id}">
       <button class="task-check" data-action="toggle" aria-label="${task.done ? "Mark incomplete" : "Complete task"}">
         <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 8 3 3 7-7"/></svg>
       </button>
       <span class="task-text"></span>
+      <button class="task-start ${isActiveTask ? "active" : ""}" data-action="start" ${task.done ? "hidden" : ""} ${state.activeSession ? "disabled" : ""} aria-label="${isActiveTask ? "This task has an active session" : `Start a work session for this task`}">${isActiveTask ? "Active" : "Start"}</button>
       <button class="task-delete" data-action="delete" aria-label="Delete task">×</button>
     </li>
-  `).join("");
+  `;
+  }).join("");
 
   state.tasks.forEach((task) => {
     const row = els.taskList.querySelector(`[data-id="${CSS.escape(task.id)}"]`);
@@ -265,6 +270,10 @@ els.taskList.addEventListener("click", (event) => {
   if (!button || !row) return;
   const index = state.tasks.findIndex((task) => task.id === row.dataset.id);
   if (index < 0) return;
+  if (button.dataset.action === "start" && !button.disabled && !state.tasks[index].done) {
+    startSession(state.tasks[index].text, state.tasks[index].id);
+    return;
+  }
   if (button.dataset.action === "toggle") state.tasks[index].done = !state.tasks[index].done;
   if (button.dataset.action === "delete") state.tasks.splice(index, 1);
   saveState();

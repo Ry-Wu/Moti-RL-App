@@ -21,6 +21,7 @@ tasks remain private to the browser where the embed is used.
 ## How scoring works
 
 - Starting a work session awards a random **+1 to +50** points.
+- Any open todo can start a session directly using the task as its intention.
 - Ending that session awards another random **+1 to +50** points.
 - Logging a detour applies a random **−1 to −100** point adjustment.
 - Individual score records can be deleted; the running total recalculates instantly.
