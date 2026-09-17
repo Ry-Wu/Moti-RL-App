@@ -16,7 +16,8 @@ Then visit `http://localhost:8000`.
 
 Use the published URL with `?embed=1` in a Notion `/embed` block. The embed flag
 removes the outer navigation and tightens spacing for Notion's canvas. Scores and
-tasks remain private to the browser where the embed is used.
+tasks remain private to the browser where the embed is used and persist for the
+current calendar day.
 
 ## How scoring works
 
@@ -25,4 +26,5 @@ tasks remain private to the browser where the embed is used.
 - Ending that session awards another random **+1 to +50** points.
 - Logging a detour applies a random **−1 to −100** point adjustment.
 - Individual score records can be deleted; the running total recalculates instantly.
-- Tasks, sessions, and scores are saved in browser `localStorage`.
+- Tasks, sessions, and scores are saved in browser `localStorage` for one calendar day.
+- At local midnight, the dashboard automatically clears and starts a fresh day.

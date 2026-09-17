@@ -6,11 +6,16 @@ if (new URLSearchParams(window.location.search).has("embed") || window.self !== 
   document.documentElement.classList.add("embedded");
 }
 
-const defaultState = {
-  tasks: [],
-  events: [],
-  activeSession: null,
-};
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function freshState() {
+  return { tasks: [], events: [], activeSession: null, dayKey: getLocalDateKey() };
+}
 
 let state = loadState();
 let timerInterval;
@@ -58,14 +63,32 @@ const els = {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return saved && typeof saved === "object" ? { ...defaultState, ...saved } : structuredClone(defaultState);
+    if (!saved || typeof saved !== "object") return freshState();
+    if (saved.dayKey && saved.dayKey !== getLocalDateKey()) return freshState();
+
+    const migrated = { ...freshState(), ...saved, dayKey: getLocalDateKey() };
+    if (!saved.dayKey) {
+      migrated.events = Array.isArray(saved.events) ? saved.events.filter((event) => isToday(event.timestamp)) : [];
+      migrated.tasks = Array.isArray(saved.tasks) ? saved.tasks.filter((task) => isToday(task.createdAt)) : [];
+      migrated.activeSession = saved.activeSession && isToday(saved.activeSession.startedAt) ? saved.activeSession : null;
+    }
+    return migrated;
   } catch {
-    return structuredClone(defaultState);
+    return freshState();
   }
 }
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function ensureCurrentDay(showNotice = false) {
+  if (state.dayKey === getLocalDateKey()) return false;
+  state = freshState();
+  saveState();
+  render();
+  if (showNotice) showToast(0, "A new day", "Yesterday is cleared. Today starts fresh.");
+  return true;
 }
 
 function randomBetween(min, max) {
@@ -103,6 +126,7 @@ function addEvent(type, score, label, sessionId = null) {
 }
 
 function startSession(intentionOverride = "", taskId = null) {
+  ensureCurrentDay();
   if (state.activeSession) return;
   const intention = intentionOverride || els.sessionInput.value.trim() || "Open work session";
   const sessionId = makeId();
@@ -116,6 +140,7 @@ function startSession(intentionOverride = "", taskId = null) {
 }
 
 function endSession() {
+  if (ensureCurrentDay()) return;
   if (!state.activeSession) return;
   const score = randomBetween(1, 50);
   const { id, intention } = state.activeSession;
@@ -127,6 +152,7 @@ function endSession() {
 }
 
 function logPenalty() {
+  ensureCurrentDay();
   const label = els.penaltyInput.value.trim() || "Unhelpful detour";
   const score = -randomBetween(1, 100);
   addEvent("penalty", score, label);
@@ -172,10 +198,9 @@ function updateTimer() {
 
 function renderScore() {
   const total = state.events.reduce((sum, event) => sum + event.score, 0);
-  const today = state.events.filter((event) => isToday(event.timestamp)).reduce((sum, event) => sum + event.score, 0);
   const completedSessionIds = new Set(state.events.filter((event) => event.type === "end").map((event) => event.sessionId));
   els.totalScore.textContent = total.toLocaleString();
-  els.scoreTrend.textContent = `${today > 0 ? "+" : ""}${today} today`;
+  els.scoreTrend.textContent = state.events.length ? `${state.events.length} ${state.events.length === 1 ? "entry" : "entries"}` : "saved today";
   els.sessionCount.textContent = `${completedSessionIds.size} session${completedSessionIds.size === 1 ? "" : "s"}`;
   els.totalScore.classList.remove("bump");
   requestAnimationFrame(() => els.totalScore.classList.add("bump"));
@@ -256,6 +281,7 @@ els.penaltyInput.addEventListener("keydown", (event) => {
 
 els.taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
+  ensureCurrentDay();
   const text = els.taskInput.value.trim();
   if (!text) return;
   state.tasks.unshift({ id: makeId(), text, done: false, createdAt: Date.now() });
@@ -265,6 +291,7 @@ els.taskForm.addEventListener("submit", (event) => {
 });
 
 els.taskList.addEventListener("click", (event) => {
+  if (ensureCurrentDay()) return;
   const button = event.target.closest("button");
   const row = event.target.closest(".task-item");
   if (!button || !row) return;
@@ -281,6 +308,7 @@ els.taskList.addEventListener("click", (event) => {
 });
 
 els.clearLogButton.addEventListener("click", () => {
+  if (ensureCurrentDay()) return;
   state.events = [];
   saveState();
   renderScore();
@@ -288,6 +316,7 @@ els.clearLogButton.addEventListener("click", () => {
 });
 
 els.activityList.addEventListener("click", (event) => {
+  if (ensureCurrentDay()) return;
   const button = event.target.closest('[data-action="delete-event"]');
   if (!button) return;
   pendingDeleteEventId = button.dataset.id;
@@ -296,6 +325,10 @@ els.activityList.addEventListener("click", (event) => {
 });
 
 els.deleteDialog.addEventListener("close", () => {
+  if (ensureCurrentDay()) {
+    pendingDeleteEventId = null;
+    return;
+  }
   if (els.deleteDialog.returnValue === "confirm" && pendingDeleteEventId) {
     state.events = state.events.filter((event) => event.id !== pendingDeleteEventId);
     saveState();
@@ -312,13 +345,16 @@ els.resetButton.addEventListener("click", () => {
 });
 els.confirmDialog.addEventListener("close", () => {
   if (els.confirmDialog.returnValue !== "confirm") return;
-  state = structuredClone(defaultState);
+  state = freshState();
   saveState();
   render();
 });
 
 document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && ensureCurrentDay(true)) return;
   if (!document.hidden && state.activeSession) updateTimer();
 });
+
+setInterval(() => ensureCurrentDay(true), 60_000);
 
 render();
