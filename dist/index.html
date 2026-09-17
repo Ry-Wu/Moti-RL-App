@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#171813" />
+    <title>Moti — Make the next move</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Moti home">
+          <span class="brand-mark">M</span>
+          <span>Moti</span>
+        </a>
+        <div class="date-chip" id="dateChip"></div>
+        <button class="icon-button" id="resetButton" aria-label="Reset all data" title="Reset all data">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.93 4.93a10 10 0 1 1-1.66 11.83M3 8V3h5"/></svg>
+        </button>
+      </header>
+
+      <section class="hero-grid">
+        <article class="session-card" id="sessionCard">
+          <div class="card-heading">
+            <span class="eyebrow">Work session</span>
+            <span class="status-pill" id="statusPill"><i></i><span>Ready</span></span>
+          </div>
+
+          <div class="session-main">
+            <div>
+              <p class="session-kicker" id="sessionKicker">Put some skin in the game.</p>
+              <h1 id="sessionTitle">What will you<br />move forward?</h1>
+            </div>
+            <div class="timer-wrap" id="timerWrap" hidden>
+              <span class="timer-label">IN FLOW</span>
+              <strong id="timer">00:00:00</strong>
+              <span class="timer-task" id="timerTask">Open session</span>
+            </div>
+          </div>
+
+          <div class="session-action-row">
+            <label class="session-input-wrap" id="sessionInputWrap">
+              <span>SESSION INTENTION</span>
+              <input id="sessionInput" maxlength="80" placeholder="e.g. Draft the opening section" autocomplete="off" />
+            </label>
+            <button class="primary-button" id="sessionButton">
+              <span id="sessionButtonText">Start session</span>
+              <span class="button-arrow">↗</span>
+            </button>
+          </div>
+          <p class="session-footnote" id="sessionFootnote">Starting earns a surprise score from +1 to +50.</p>
+        </article>
+
+        <aside class="score-card">
+          <div class="card-heading">
+            <span class="eyebrow">Current score</span>
+            <span class="score-trend" id="scoreTrend">— today</span>
+          </div>
+          <div class="score-total" id="totalScore">0</div>
+          <div class="score-meta">
+            <span>ALL TIME</span>
+            <span id="sessionCount">0 sessions</span>
+          </div>
+          <div class="score-chart" id="scoreChart" aria-label="Recent score activity"></div>
+          <div class="score-legend">
+            <span><i class="reward-dot"></i> rewards</span>
+            <span><i class="penalty-dot"></i> detours</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel task-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">Next moves</span>
+              <h2>Your list</h2>
+            </div>
+            <span class="count-badge" id="taskCount">0 open</span>
+          </div>
+
+          <form class="add-task" id="taskForm">
+            <button type="submit" aria-label="Add task">+</button>
+            <input id="taskInput" maxlength="100" placeholder="Add a small, clear task..." autocomplete="off" />
+            <kbd>ENTER</kbd>
+          </form>
+          <ul class="task-list" id="taskList"></ul>
+          <div class="empty-state" id="emptyTasks">
+            <span>✦</span>
+            <p>Nothing here yet. Add one tiny next move.</p>
+          </div>
+        </article>
+
+        <aside class="side-stack">
+          <article class="panel check-card">
+            <span class="eyebrow">Course correct</span>
+            <h2>Made a detour?</h2>
+            <p>No guilt, just a little signal. Log it and return to what matters.</p>
+            <div class="penalty-form">
+              <input id="penaltyInput" maxlength="80" placeholder="What pulled you away?" autocomplete="off" />
+              <button id="penaltyButton">
+                <span>Log detour</span>
+                <span>−1…100</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="panel activity-panel">
+            <div class="panel-header compact">
+              <div>
+                <span class="eyebrow">Score log</span>
+                <h2>Recent activity</h2>
+              </div>
+              <button class="text-button" id="clearLogButton">Clear</button>
+            </div>
+            <div class="activity-list" id="activityList"></div>
+            <div class="empty-state activity-empty" id="emptyActivity">
+              <span>↗</span>
+              <p>Your first score will show up here.</p>
+            </div>
+          </article>
+        </aside>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <div class="toast-score" id="toastScore">+24</div>
+      <div>
+        <strong id="toastTitle">Session started</strong>
+        <p id="toastMessage">Momentum looks good on you.</p>
+      </div>
+    </div>
+
+    <dialog id="confirmDialog">
+      <form method="dialog">
+        <span class="dialog-icon">↺</span>
+        <h2>Fresh start?</h2>
+        <p>This clears your tasks, sessions, and score history from this device.</p>
+        <div class="dialog-actions">
+          <button value="cancel" class="dialog-cancel">Keep my data</button>
+          <button value="confirm" class="dialog-confirm">Reset everything</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
