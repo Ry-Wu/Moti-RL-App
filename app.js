@@ -15,6 +15,7 @@ const defaultState = {
 let state = loadState();
 let timerInterval;
 let toastTimer;
+let pendingDeleteEventId = null;
 
 const $ = (selector) => document.querySelector(selector);
 const els = {
@@ -47,6 +48,7 @@ const els = {
   clearLogButton: $("#clearLogButton"),
   resetButton: $("#resetButton"),
   confirmDialog: $("#confirmDialog"),
+  deleteDialog: $("#deleteDialog"),
   toast: $("#toast"),
   toastScore: $("#toastScore"),
   toastTitle: $("#toastTitle"),
@@ -221,6 +223,7 @@ function renderActivity() {
         <span>${labels[event.type]} · ${relativeTime(event.timestamp)}</span>
       </span>
       <span class="activity-score">${event.score > 0 ? "+" : ""}${event.score}</span>
+      <button class="activity-delete" data-action="delete-event" data-id="${event.id}" aria-label="Delete ${labels[event.type].toLowerCase()} record" title="Delete record">×</button>
     </div>
   `).join("");
   recent.forEach((event, index) => {
@@ -275,7 +278,29 @@ els.clearLogButton.addEventListener("click", () => {
   renderActivity();
 });
 
-els.resetButton.addEventListener("click", () => els.confirmDialog.showModal());
+els.activityList.addEventListener("click", (event) => {
+  const button = event.target.closest('[data-action="delete-event"]');
+  if (!button) return;
+  pendingDeleteEventId = button.dataset.id;
+  els.deleteDialog.returnValue = "";
+  els.deleteDialog.showModal();
+});
+
+els.deleteDialog.addEventListener("close", () => {
+  if (els.deleteDialog.returnValue === "confirm" && pendingDeleteEventId) {
+    state.events = state.events.filter((event) => event.id !== pendingDeleteEventId);
+    saveState();
+    renderScore();
+    renderActivity();
+    showToast(0, "Record deleted", "Your score total has been recalculated.");
+  }
+  pendingDeleteEventId = null;
+});
+
+els.resetButton.addEventListener("click", () => {
+  els.confirmDialog.returnValue = "";
+  els.confirmDialog.showModal();
+});
 els.confirmDialog.addEventListener("close", () => {
   if (els.confirmDialog.returnValue !== "confirm") return;
   state = structuredClone(defaultState);

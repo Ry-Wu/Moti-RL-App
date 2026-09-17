@@ -23,4 +23,5 @@ tasks remain private to the browser where the embed is used.
 - Starting a work session awards a random **+1 to +50** points.
 - Ending that session awards another random **+1 to +50** points.
 - Logging a detour applies a random **−1 to −100** point adjustment.
+- Individual score records can be deleted; the running total recalculates instantly.
 - Tasks, sessions, and scores are saved in browser `localStorage`.
